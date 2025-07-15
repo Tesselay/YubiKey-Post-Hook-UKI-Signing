@@ -28,6 +28,10 @@ mapfile -t connected_yks < <(ykman list -s)
 
 # --- Signing ---
 for yk_serial in "${connected_yks[@]}"; do
+	if ! ykman --device "$yk_serial" piv keys info "$slot_db" &>/dev/null; then
+		continue
+	fi
+
 	tmp_crt=$(mktemp --suffix=.crt)
 	cleanup() { rm -f "$tmp_crt"; }
 	trap cleanup EXIT

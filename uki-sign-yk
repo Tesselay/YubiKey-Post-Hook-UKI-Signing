@@ -23,7 +23,8 @@ mapfile -t connected_yks < <(ykman list -s)
 
 [[ ${#connected_yks[@]} -gt 0 ]] || {
 	echo "No YubiKeys detected, signing aborted" >&2
-	exit 2
+	echo "The UKI will be unsigned, fix it!" >&2
+	exit 0
 }
 
 # --- Signing ---

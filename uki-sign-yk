@@ -41,7 +41,7 @@ for yk_serial in "${connected_yks[@]}"; do
 
 	if /usr/lib/systemd/systemd-sbsign verify --certificate="$tmp_crt" "$uki" &>/dev/null; then
 		cleanup
-		continue
+		break
 	fi
 
 	echo "Signing $uki with YubiKey $yk_serial"

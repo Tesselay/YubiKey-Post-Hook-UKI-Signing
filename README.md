@@ -2,7 +2,7 @@
 
 This is a small **mkinitcpio** post hook that will trigger a signing process to the UKI provided using any inserted YubiKey and `systemd-sbsign`.
 
-It will check if a YubiKey is inserted, if the provided slot has any private key in it and whether the UKI is already signed by the YubiKey, skipping or aborting the process if it does.
+It will check if a YubiKey is inserted, if the provided slot has any private key in it and whether the UKI is already signed by the YubiKey, skipping the process if the result is not correct.
 
 Will ask for a PIN when the slot is configured as such.
 

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# --- Extract UKI from arguments ---
+shopt -s nocasematch
+uki=
+for arg in "$@"; do
+	if [[ $arg == *.efi && -f $arg ]]; then
+		uki=$arg
+		break
+	fi
+done
+shopt -u nocasematch
+[[ -n "$uki" ]] || {
+	echo "No UKI argument found" >&2
+	exit 0
+}
+
+# --- Constants ---
+slot_db="0x84"
+id_db="%07"
+mapfile -t connected_yks < <(ykman list -s)
+
+[[ ${#connected_yks[@]} -gt 0 ]] || {
+	echo "No YubiKeys detected, signing aborted" >&2
+	exit 2
+}
+
+# --- Signing ---
+for yk_serial in "${connected_yks[@]}"; do
+	tmp_crt=$(mktemp --suffix=.crt)
+	cleanup() { rm -f "$tmp_crt"; }
+	trap cleanup EXIT
+
+	ykman --device "$yk_serial" piv certificates export "$slot_db" "$tmp_crt"
+
+	if /usr/lib/systemd/systemd-sbsign verify --certificate="$tmp_crt" "$uki" &>/dev/null; then
+		cleanup
+		continue
+	fi
+
+	echo "Signing $uki with YubiKey $yk_serial"
+
+	/usr/lib/systemd/systemd-sbsign sign \
+		--private-key-source=provider:pkcs11 \
+		--private-key="pkcs11:serial=$yk_serial;id=$id_db;type=private" \
+		--certificate="$tmp_crt" \
+		--output "$uki" "$uki"
+
+	cleanup
+	break
+done

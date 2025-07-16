@@ -12,10 +12,11 @@ Will ask for a PIN when the slot is configured as such.
 
 ## Installation
 
-Clone repository and just move/cp the file to `/etc/initcpio/post/`
+Clone repository and move/cp the file to `/etc/initcpio/post/`. Make it executable.
 
 ```bash
-mv uki-sign-yk /etc/initcpio/post/uki-sign-yk
+$ mv uki-sign-yk /etc/initcpio/post/uki-sign-yk
+$ chmod +x /etc/initcpio/post/uki-sign-yk
 ```
 
 **Remember to set the correct db slot inside the script!**
@@ -27,9 +28,9 @@ It will auto execute on every UKI generation when using mkinitcpio.
 Test it by invocating the script directly or by rebuilding the UKI.
 
 ```bash
-/path/to/uki-sign-yk /path/to/UKI.efi
+$ /path/to/uki-sign-yk /path/to/UKI.efi
 ```
 
 ```bash
-mkinitcpio -P
+$ mkinitcpio -P
 ```
